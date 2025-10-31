@@ -17,7 +17,7 @@ view = Blueprint("views", __name__)
 def home():
     # Import models and db here to avoid circular-import / ImportError when
     # the module is imported during app startup.
-    from .models import Note
+    from .models import Note, User
     from . import db
 
     if request.method == "POST":
