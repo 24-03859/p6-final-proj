@@ -26,14 +26,19 @@ def home():
         note = request.form.get("note") or ""
 
         if len(note) < 1:
-            flash("Note too short!", category="error")
+            # flash("Note too short!", category="error")
+            return {
+                "status": 406,
+                "message": "Note too short!"
+            }
         else:
             new_note = Note(data=note, user_id=current_user.id)
             db.session.add(new_note)
             db.session.commit()
-            flash("Note Added!", category="success")
-
-    return render_template("home.html", user=current_user)
+            return {
+                "status": 200,
+                "message": "Feedback Added!"
+            }
 
 
 # NOTE: Defining two routes with the same path `/` (one for GET/POST and

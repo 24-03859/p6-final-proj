@@ -1,20 +1,21 @@
 from flask import Blueprint, request
-from .models import User
-from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import logout_user, login_user, login_required, current_user
-from flask_cors import CORS, cors_origin
+from flask_cors import CORS, cross_origin
 
 auth = Blueprint("auth", __name__)
 
-@cors_origin
+@cross_origin
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        username = request.form.get("username")
         password = request.form.get("password")
 
-        user = User.query.filter_by(email=email).first()
+        from .models import User
+        from . import db
+
+        user = User.query.filter_by(username=username).first()
         if user:
             if check_password_hash(user.password, password):
                # flash("Account logged in Successfully!", category="success")
@@ -54,12 +55,14 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        email = request.form.get("email")
-        first_name = request.form.get("firstName")
+        username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        user = User.query.filter_by(email=email).first()
+        from .models import User
+        from . import db
+
+        user = User.query.filter_by(username=username).first()
 
         if user:
             # flash("Email Already Exist!", category="error")
@@ -67,17 +70,11 @@ def sign_up():
                 "status": 406,
                 "message": "Email Already Exist!"
             }
-        elif len(email) < 4:
+        elif len(username) < 4:
             # flash("Email must be more than 4 characters.", category="error")
             return {
                 "status": 406,
                 "message": "Email must be more than 4 characters."
-            }
-        elif len(first_name) < 2:
-            # flash("First Name should atleast contain 2 characters.", category="error")
-            return {
-                "status": 406,
-                "message": "First Name should atleast contain 2 characters."
             }
         elif len(password1) < 7:
             # flash("password must contain more than 6 characters.", category="error")
@@ -92,15 +89,15 @@ def sign_up():
                 "message": "Password don't match!"
             }
         else:
-            user = User.query.filter_by(email=email).first()
+            user = User.query.filter_by(username=username).first()
             if user:
                 # flash('Email already exists.', category='error')
                 return {
                     "status": 406,
-                    "message": "Email already exists."
+                    "message": "Username already exists."
                 }
             else:
-                new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method="pbkdf2:sha256"))
+                new_user = User(username=username, password=generate_password_hash(password1, method="pbkdf2:sha256"))
                 db.session.add(new_user)    
                 db.session.commit()
                 login_user(new_user, remember=True)
