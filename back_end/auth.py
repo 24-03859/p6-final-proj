@@ -49,6 +49,7 @@ def login():
         "message": "Logged In Successfully!"
     }
 
+@cross_origin
 @auth.route("/logout")
 @login_required
 def logout():
@@ -58,6 +59,7 @@ def logout():
         "message": "Logged out Successfully!"
     }
 
+@cross_origin
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
