@@ -40,7 +40,7 @@ def login():
             # flash("Email does not exist.", category="error")
             return {
                 "status": 406,
-                "message": "Email does not exist"
+                "message": "Username does not exist"
             }
         
     # return render_template("login.html", user=current_user)
@@ -67,7 +67,6 @@ def sign_up():
         # Accept either 'username' or 'email' (or 'firstName') to be resilient.
         username = (
             request.form.get("username")
-            or request.form.get("email")
             or request.form.get("firstName")
             or ""
         ).strip()
@@ -87,10 +86,10 @@ def sign_up():
             }
         # Validate username after normalizing to empty-string when missing.
         elif len(username) < 4:
-            # flash("Email must be more than 4 characters.", category="error")
+            # flash("Email must be more than 3 characters.", category="error")
             return {
                 "status": 406,
-                "message": "Email must be more than 4 characters."
+                "message": "Username must be more than 3 characters."
             }
         elif len(password1) < 7:
             # flash("password must contain more than 6 characters.", category="error")
