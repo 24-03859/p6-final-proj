@@ -19,6 +19,6 @@ class Note(db.Model):
 
 class Point(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    Points = db.Column(db.Integer)
-    point_date = db.Column(db.Datetime(timezone=True), default=func.now())
+    points = db.Column(db.Integer)
+    point_date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

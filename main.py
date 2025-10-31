@@ -1,6 +1,10 @@
 from back_end import create_app
+from flask_cors import CORS, cross_origin
+
 
 app=create_app()
+cors = CORS(app) # allow CORS for all domains on all routes.
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 if __name__ == "__main__":
     app.run(debug=True)
