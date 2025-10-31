@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 
 app=create_app()
 
-cors = CORS(app, resources={r"/api/": {"origins": ""}})
+cors = CORS(app, resources={r"/api/": {"origins": "http://localhost:5173/"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 if __name__ == "__main__":

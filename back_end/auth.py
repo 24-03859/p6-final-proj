@@ -3,9 +3,11 @@ from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import logout_user, login_user, login_required, current_user
+from flask_cors import CORS, cors_origin
 
 auth = Blueprint("auth", __name__)
 
+@cors_origin
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
