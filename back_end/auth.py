@@ -4,7 +4,7 @@ from flask_login import logout_user, login_user, login_required, current_user
 from flask_cors import CORS, cross_origin
 
 auth = Blueprint("auth", __name__)
-
+cors = CORS(auth, resources={r"/api/*": {"origins": "http://localhost:5173/"}})
 @cross_origin
 @auth.route("/login", methods=["GET", "POST"])
 def login():
@@ -59,20 +59,17 @@ def logout():
         "message": "Logged out Successfully!"
     }
 
-@cross_origin
 @auth.route("/sign-up", methods=["GET", "POST"])
+@cross_origin()
 def sign_up():
     if request.method == "POST":
         # Templates use 'email' and 'firstName' for the name fields.
         # Accept either 'username' or 'email' (or 'firstName') to be resilient.
-        username = (
-            request.form.get("username")
-            or request.form.get("email")
-            or request.form.get("firstName")
-            or ""
-        ).strip()
-        password1 = request.form.get("password1") or ""
-        password2 = request.form.get("password2") or ""
+        data = request.json
+        username = data.get("username") or ""
+            
+        password1 = data.get("password1") or ""
+        password2 = data.get("password2") or ""
 
         from .models import User
         from . import db
@@ -83,14 +80,14 @@ def sign_up():
             # flash("Email Already Exist!", category="error")
             return {
                 "status": 406,
-                "message": "Email Already Exist!"
+                "message": "Username Already Exist!"
             }
         # Validate username after normalizing to empty-string when missing.
         elif len(username) < 4:
             # flash("Email must be more than 4 characters.", category="error")
             return {
                 "status": 406,
-                "message": "Email must be more than 4 characters."
+                "message": "Username must be more than 4 characters."
             }
         elif len(password1) < 7:
             # flash("password must contain more than 6 characters.", category="error")
