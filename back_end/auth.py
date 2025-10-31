@@ -1,16 +1,19 @@
-from flask import Blueprint, request
-from .models import User
-from . import db
+from flask import Blueprint,json, request
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import logout_user, login_user, login_required, current_user
-
+from flask_cors import CORS, cross_origin
 auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=["GET", "POST"])
+@cross_origin()
 def login():
+    from .models import User
+    from . import db    
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        data = request.json
+        email = data.get("email")
+        password = data.get("password")
 
         user = User.query.filter_by(email=email).first()
         if user:
@@ -31,7 +34,10 @@ def login():
             # flash("Email does not exist.", category="error")
             return {
                 "status": 406,
-                "message": "Email does not exist"
+                "message": "Email does not exist",
+                "email": email,
+                "password": password,
+                "data": data
             }
         
     # return render_template("login.html", user=current_user)
