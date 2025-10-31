@@ -9,7 +9,13 @@ auth = Blueprint("auth", __name__)
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
+        # Accept either 'username' or 'email' (templates use 'email')
+        username = (
+            request.form.get("username")
+            or request.form.get("email")
+            or request.form.get("firstName")
+            or ""
+        ).strip()
         password = request.form.get("password")
 
         from .models import User
@@ -55,9 +61,16 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        username = request.form.get("username")
-        password1 = request.form.get("password1")
-        password2 = request.form.get("password2")
+        # Templates use 'email' and 'firstName' for the name fields.
+        # Accept either 'username' or 'email' (or 'firstName') to be resilient.
+        username = (
+            request.form.get("username")
+            or request.form.get("email")
+            or request.form.get("firstName")
+            or ""
+        ).strip()
+        password1 = request.form.get("password1") or ""
+        password2 = request.form.get("password2") or ""
 
         from .models import User
         from . import db
@@ -70,6 +83,7 @@ def sign_up():
                 "status": 406,
                 "message": "Email Already Exist!"
             }
+        # Validate username after normalizing to empty-string when missing.
         elif len(username) < 4:
             # flash("Email must be more than 4 characters.", category="error")
             return {
