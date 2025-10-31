@@ -8,8 +8,13 @@ if __name__ == "__main__":
 
 # Modification:
 # sa user ang attributes nalang ay username, password & password confirmation
+# note -> feedback
 
 # Dagdag:
 # Leaderboards (LIVE)
 
-#asdasdasd
+#ang magagamit ay:
+# all about user
+
+#pag aaralan:
+#TOKEN
