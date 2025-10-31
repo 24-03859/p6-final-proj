@@ -6,4 +6,8 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-    #update
+# Modification:
+# sa user ang attributes nalang ay username, password & password confirmation
+
+# Dagdag:
+# Leaderboards (LIVE)
