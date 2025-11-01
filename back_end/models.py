@@ -6,12 +6,13 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(100))
-    notes = db.relationship("Note")
+    message = db.relationship("Feedback")
     # points = db.relationship("Point")
 
-class Note(db.Model):
+class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(10000))
+    rating = db.Column(db.SmallInteger) # 1-5 lang
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 

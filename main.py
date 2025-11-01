@@ -9,6 +9,7 @@ app=create_app()
 # which does not match routes like /sign-up. Also enable credentials so
 # cookies/session-based auth works across origins when the frontend uses
 # `fetch(..., { credentials: 'include' })`.
+cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173/"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app,
     resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}},

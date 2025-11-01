@@ -1,39 +1,43 @@
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
 import json
-
-# NOTE: Importing models at module import time can sometimes trigger
-# circular-import problems (ImportError) in Flask apps where the package
-# `back_end` initializes `db` and registers blueprints in `create_app()`.
-# To avoid that, import the `Note` model (and package `db`) inside the
-# request-handling functions where they're actually needed.
+from flask_cors import CORS, cross_origin
 
 view = Blueprint("views", __name__)
 
-# NOTE: The correct Flask parameter name is `methods` (plural).
-# Using `method=[...]` will raise TypeError: unexpected keyword argument 'method'.
 @view.route("/", methods=["GET", "POST"])
+@cross_origin()
 @login_required
 def home():
-    # Import models and db here to avoid circular-import / ImportError when
-    # the module is imported during app startup.
-    from .models import Note, User
+    from .models import Feedback, User
     from . import db
 
     if request.method == "POST":
-        # request.form.get may return None if 'note' isn't supplied.
-        # Guard against that to avoid TypeError from len(None).
-        note = request.form.get("note") or ""
+        print("Content-Type:", request.headers.get('Content-Type'))
+        print("Is JSON?", request.is_json)
 
-        if len(note) < 1:
-            # flash("Note too short!", category="error")
-            return {
-                "status": 406,
-                "message": "Note too short!"
-            }
+        if request.is_json:
+            data = request.get_json() #-----> nagamit parin naman nung nilagay mo, nangyari lang parehas form at yung sayo
+            print("JSON Data:", data)
         else:
-            new_note = Note(data=note, user_id=current_user.id)
-            db.session.add(new_note)
+            data = request.form  # ------> ETO SIR!!!
+            print("Form Data:", dict(data))
+        
+        message = (
+            data.get("message")  # if frontend sends { message: "..." }
+            or data.get("data")  # if frontend sends { data: "..." }
+            or data.get("feedback")  # if frontend sends { feedback: "..." }
+            or data.get("note")  # if frontend sends { note: "..." }
+            or ""
+        )
+
+        rating = data.get("rating")
+
+        if not message:
+            return jsonify({"status": 400, "message": "No feedback message provided."})
+        else:
+            new_feedback = Feedback(data=message, rating=rating, user_id=current_user.id)
+            db.session.add(new_feedback)
             db.session.commit()
             return {
                 "status": 200,
@@ -41,37 +45,35 @@ def home():
             }
 
 
-# NOTE: Defining two routes with the same path `/` (one for GET/POST and
-# another for delete) causes routing conflicts. Use a distinct endpoint
-# for delete actions and the correct `methods` keyword.
-@view.route("/delete-note", methods=["POST"])
-def delete_note():
-    # request.data is a bytes object; parse JSON safely and handle errors.
-    try:
-        data = json.loads(request.data)
-    except Exception:
-        # Return a client error if JSON is invalid.
-        return {"error": "invalid request"}, 400
+# @view.route("/delete-note", methods=["POST"])
+# @cross_origin()
+# def delete_note():
+#     # request.data is a bytes object; parse JSON safely and handle errors.
+#     try:
+#         data = json.loads(request.data)
+#     except Exception:
+#         # Return a client error if JSON is invalid.
+#         return {"error": "invalid request"}, 400
 
-    # The original code mistakenly accessed Note.data["noteID"].
-    # `Note` is the model class; `Note.data` is a Column descriptor, not
-    # the incoming JSON. We must read the note ID from the parsed JSON.
-    note_id = data.get("noteID") or data.get("noteId")
-    if not note_id:
-        return {"error": "missing note id"}, 400
+#     # The original code mistakenly accessed Note.data["noteID"].
+#     # `Note` is the model class; `Note.data` is a Column descriptor, not
+#     # the incoming JSON. We must read the note ID from the parsed JSON.
+#     note_id = data.get("noteID") or data.get("noteId")
+#     if not note_id:
+#         return {"error": "missing note id"}, 400
 
-    # Import Note and db here to avoid ImportError during module import.
-    from .models import Note
-    from . import db
+#     # Import Note and db here to avoid ImportError during module import.
+#     from .models import Note
+#     from . import db
 
-    note = Note.query.get(note_id)
-    if not note:
-        return {"error": "note not found"}, 404
+#     note = Note.query.get(note_id)
+#     if not note:
+#         return {"error": "note not found"}, 404
 
-    # Ensure the logged-in user owns the note before deleting.
-    if note.user_id != current_user.id:
-        return {"error": "unauthorized"}, 403
+#     # Ensure the logged-in user owns the note before deleting.
+#     if note.user_id != current_user.id:
+#         return {"error": "unauthorized"}, 403
 
-    db.session.delete(note)
-    db.session.commit()
-    return jsonify({})
+#     db.session.delete(note)
+#     db.session.commit()
+#     return jsonify({})

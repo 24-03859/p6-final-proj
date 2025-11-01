@@ -8,3 +8,7 @@ leaderboard = Blueprint("leaderboard", __name__)
 @leaderboard.route("/", methods=["GET", "POST"])
 def leaderboards():
     pass
+
+
+
+# sir owen are ay uumpisahan ko palang
