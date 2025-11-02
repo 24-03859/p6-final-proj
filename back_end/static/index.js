@@ -1,3 +1,33 @@
+async function submitFeedback(message, rating) {
+    try {
+        const response = await fetch('/rate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                rating: rating
+            }),
+            credentials: 'include' // This is important for session cookies
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Feedback submitted successfully!');
+            return true;
+        } else {
+            alert(data.message || 'Error submitting feedback');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        alert('Failed to submit feedback. Please try again.');
+        return false;
+    }
+}
+
 // deleteNote sends a POST to /delete-note with JSON { noteID }.
 // The original project either omitted this function or used the wrong
 // variable name (`noteID` instead of `noteId`) which caused client-side
@@ -27,4 +57,5 @@ async function deleteNote(noteId) {
     }
 }
 
+window.submitFeedback = submitFeedback;
 window.deleteNote = deleteNote;
