@@ -30,7 +30,7 @@ def home():
         if raw_rating is None:
             return jsonify({
                 "status": 400,
-                "message": "Rating is required"
+                "message": ""
             })
             
         # Convert to integer
@@ -59,14 +59,7 @@ def home():
             or data.get("feedback")
             or data.get("content")
             or ""
-        ).strip()
-
-        # Validate message
-        if not message:
-            return jsonify({
-                "status": 400,
-                "message": ""
-            })
+        ).strip()   
 
         # Save the feedback
         try:
