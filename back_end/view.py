@@ -13,46 +13,34 @@ def home():
     from . import db
 
     if request.method == "POST":
-        # Get data from either JSON or form data
         if request.is_json:
             data = request.get_json()
         else:
             data = request.form.to_dict()
 
-        # Print received data for debugging
-        print("Received data:", data)
-
-        # Get rating with detailed logging
         raw_rating = data.get("rating")
         print(f"Raw rating value: {raw_rating}, Type: {type(raw_rating)}")
         
-        # Handle missing rating
         if raw_rating is None:
             return jsonify({
                 "status": 400,
                 "message": ""
             })
             
-        # Convert to integer
         try:
-            rating = int(float(raw_rating))  # Handle both string and float inputs
-            print(f"Converted rating: {rating}, Type: {type(rating)}")
+            rating = int(float(raw_rating))
             
-            # Validate range
             if not (1 <= rating <= 5):
                 return jsonify({
                     "status": 400,
                     "message": f"Rating must be between 1 and 5. You sent: {rating}"
                 })
         except (ValueError, TypeError) as e:
-            print(f"Rating conversion error: {str(e)}")
             return jsonify({
                 "status": 400,
                 "message": f"Invalid rating value: {raw_rating}. Must be a number between 1 and 5."
             })
 
-        
-        # Get message with multiple field name fallbacks
         message = (
             data.get("message")
             or data.get("data")
@@ -61,7 +49,6 @@ def home():
             or ""
         ).strip()   
 
-        # Save the feedback
         try:
             new_feedback = Feedback(
                 data=message,
@@ -81,7 +68,6 @@ def home():
             })
         except Exception as e:
             db.session.rollback()
-            print("Error saving feedback:", str(e))
             return jsonify({
                 "status": 500,
                 "message": "Error saving feedback. Please try again."

@@ -7,7 +7,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(255))
     message = db.relationship("Feedback")
-    # points = db.relationship("Point")
+    scores = db.relationship("Score", backref="user", lazy=True)
 
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,9 +16,11 @@ class Feedback(db.Model):
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+class Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    score = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-# class Point(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     points = db.Column(db.Integer)
-#     point_date = db.Column(db.DateTime(timezone=True), default=func.now())
-#     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    def __repr__(self):
+        return f'<Score {self.score} by User {self.user_id}>'

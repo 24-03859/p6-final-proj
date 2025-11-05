@@ -4,11 +4,6 @@ from flask_cors import CORS, cross_origin
 
 app=create_app()
 
-# Allow the frontend dev server (Vite/webpack/etc) to call Flask endpoints.
-# The original configuration only opened /api/ and used a trailing slash
-# which does not match routes like /sign-up. Also enable credentials so
-# cookies/session-based auth works across origins when the frontend uses
-# `fetch(..., { credentials: 'include' })`.
 cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173/"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app,

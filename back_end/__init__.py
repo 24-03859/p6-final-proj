@@ -14,11 +14,13 @@ def create_app():
 
     from .view import view
     from .auth import auth
+    from .leaderboards import leaderboard
 
     app.register_blueprint(view, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
+    app.register_blueprint(leaderboard, url_prefix="/")
 
-    from .models import User, Feedback
+    from .models import User, Feedback, Score
 
     create_database(app)
 
